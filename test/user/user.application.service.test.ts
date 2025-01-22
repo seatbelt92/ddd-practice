@@ -2,7 +2,8 @@ import { DataSource } from "typeorm";
 import { TestDataSource } from "../test.datasource";
 import { UserRepository } from "../../src/user/user.repository";
 import { UserService } from "../../src/user/user.service";
-import { UserApplicationService } from "../../src/user/user.application.service";
+import { UserApplicationService } from "../../src/user/application/user.application.service";
+import { UserPersistenceService } from "../../src/user/application/user.persistence.service";
 import { UserTORepository } from "../../src/user/user.to.repository";
 import { AlreadyExistError, ResourceNotFoundError } from "../../src/common/base.error";
 import {
@@ -17,12 +18,14 @@ describe("UserApplicationService", () => {
     let userRepository: UserRepository;
     let userService: UserService;
     let userAppService: UserApplicationService;
+    let userPerService: UserPersistenceService;
 
     beforeEach(async () => {
         datasource = await new TestDataSource().initialize();
         userRepository = new UserTORepository(datasource);
         userService = new UserService(userRepository);
         userAppService = new UserApplicationService(userService, userRepository);
+        userPerService = new UserPersistenceService(userRepository);
     });
 
     afterEach(async () => {
@@ -80,7 +83,7 @@ describe("UserApplicationService", () => {
         const userName = "testUser1";
         const user = await userAppService.registerUser(new UserRegisterCommand(userName));
 
-        const savedUser = await userAppService.getUser(new UserGetCommand(user.userId.value));
+        const savedUser = await userPerService.getUser(new UserGetCommand(user.userId.value));
 
         expect(savedUser.userId.value).toBe(user.userId.value);
         expect(savedUser.userName.value).toBe(userName);
@@ -88,7 +91,7 @@ describe("UserApplicationService", () => {
 
     test("throw an error when getting a user by non-existent id", async () => {
         const nonExistentId = "non-existent-id";
-        await expect(userAppService.getUser(new UserGetCommand(nonExistentId))).rejects.toThrow(
+        await expect(userPerService.getUser(new UserGetCommand(nonExistentId))).rejects.toThrow(
             ResourceNotFoundError,
         );
     });
@@ -97,7 +100,7 @@ describe("UserApplicationService", () => {
         await userAppService.registerUser(new UserRegisterCommand("user1"));
         await userAppService.registerUser(new UserRegisterCommand("user2"));
 
-        const users = await userAppService.getUsers();
+        const users = await userPerService.getUsers();
 
         expect(users).toHaveLength(2);
         expect(users.map((u) => u.userName.value)).toEqual(
@@ -107,7 +110,7 @@ describe("UserApplicationService", () => {
 
     test("delete a user", async () => {
         const user = await userAppService.registerUser(new UserRegisterCommand("testUser"));
-        const deletedUser = await userAppService.deleteUser(
+        const deletedUser = await userPerService.deleteUser(
             new UserDeleteCommand(user.userId.value),
         );
 
@@ -118,7 +121,7 @@ describe("UserApplicationService", () => {
     test("throw an error when deleting a non-existent user", async () => {
         const nonExistentId = "non-existent-id";
         await expect(
-            userAppService.deleteUser(new UserDeleteCommand(nonExistentId)),
+            userPerService.deleteUser(new UserDeleteCommand(nonExistentId)),
         ).rejects.toThrow(ResourceNotFoundError);
     });
 });

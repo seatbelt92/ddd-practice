@@ -2,7 +2,7 @@ import { Router } from "express";
 import { constants } from "http2";
 import { UserTORepository } from "../../src/user/user.to.repository";
 import { UserService } from "../../src/user/user.service";
-import { UserApplicationService } from "../../src/user/user.application.service";
+import { UserApplicationService } from "../../src/user/application/user.application.service";
 import { AppDataSource } from "../../src/common/datasource";
 import {
     UserDeleteCommand,
@@ -10,6 +10,7 @@ import {
     UserRegisterCommand,
     UserUpdateCommand,
 } from "../../src/user/user.command";
+import { UserPersistenceService } from "../../src/user/application/user.persistence.service";
 
 const userRoutes = Router();
 const datasource = new AppDataSource();
@@ -17,6 +18,7 @@ datasource.initialize();
 const userRepository = new UserTORepository(datasource);
 const userService = new UserService(userRepository);
 const userAppService = new UserApplicationService(userService, userRepository);
+const userPerService = new UserPersistenceService(userRepository);
 
 userRoutes.post("/", async (req, res, next) => {
     try {
@@ -33,7 +35,7 @@ userRoutes.get("/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
         const command = new UserGetCommand(id);
-        const user = await userAppService.getUser(command);
+        const user = await userPerService.getUser(command);
         res.status(constants.HTTP_STATUS_OK).json(user);
     } catch (err) {
         next(err);
@@ -42,7 +44,7 @@ userRoutes.get("/:id", async (req, res, next) => {
 
 userRoutes.get("/", async (req, res, next) => {
     try {
-        const users = await userAppService.getUsers();
+        const users = await userPerService.getUsers();
         res.status(constants.HTTP_STATUS_OK).json(users);
     } catch (err) {
         next(err);
@@ -65,7 +67,7 @@ userRoutes.delete("/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
         const command = new UserDeleteCommand(id);
-        const user = await userAppService.deleteUser(command);
+        const user = await userPerService.deleteUser(command);
         res.status(constants.HTTP_STATUS_OK).json(user);
     } catch (err) {
         next(err);
