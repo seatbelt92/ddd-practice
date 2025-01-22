@@ -1,5 +1,11 @@
 import { AlreadyExistError, ResourceNotFoundError } from "../common/base.error";
 import { User } from "./user";
+import {
+    UserDeleteCommand,
+    UserGetCommand,
+    UserRegisterCommand,
+    UserUpdateCommand,
+} from "./user.command";
 import { UserDataModel } from "./user.dto";
 import { UserRepository } from "./user.repository";
 import { UserService } from "./user.service";
@@ -11,7 +17,8 @@ export class UserApplicationService {
         private userRepository: UserRepository,
     ) {}
 
-    async registerUser(name: string): Promise<UserDataModel> {
+    async registerUser(command: UserRegisterCommand): Promise<UserDataModel> {
+        const { name } = command;
         const user = new User(new UserName(name));
         const userNameExists = await this.userService.exists(user);
         if (userNameExists) {
@@ -20,7 +27,8 @@ export class UserApplicationService {
         return new UserDataModel(await this.userRepository.save(user));
     }
 
-    async updateUser(id: string, name: string): Promise<UserDataModel> {
+    async updateUser(command: UserUpdateCommand): Promise<UserDataModel> {
+        const { id, name } = command;
         const user = await this.userRepository.findById(new UserId(id));
         if (!user) throw new ResourceNotFoundError();
 
@@ -35,7 +43,8 @@ export class UserApplicationService {
         return new UserDataModel(await this.userRepository.save(user));
     }
 
-    async getUser(id: string): Promise<UserDataModel> {
+    async getUser(command: UserGetCommand): Promise<UserDataModel> {
+        const { id } = command;
         const user = await this.userRepository.findById(new UserId(id));
         if (!user) throw new ResourceNotFoundError();
 
@@ -48,7 +57,8 @@ export class UserApplicationService {
             .then((users) => users.map((user) => new UserDataModel(user)));
     }
 
-    async deleteUser(id: string): Promise<UserDataModel> {
+    async deleteUser(command: UserDeleteCommand): Promise<UserDataModel> {
+        const { id } = command;
         const user = await this.userRepository.findById(new UserId(id));
         if (!user) throw new ResourceNotFoundError();
 
