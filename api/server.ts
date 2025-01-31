@@ -1,20 +1,22 @@
+import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import { UserRoute } from "./user/user.route";
 import { errorHandler } from "./middleware/error.handler";
 import { DatasourceInitalizer } from "./datasource.initializer";
+import { container } from "tsyringe";
 
 async function bootstrap() {
     const app = express();
     const port = 3000;
 
-    const datasourceInitalizer = new DatasourceInitalizer();
-    const datasource = await datasourceInitalizer.initialize();
+    const datasourceInitalizer = container.resolve(DatasourceInitalizer);
+    await datasourceInitalizer.initialize();
 
-    const userRoutes = new UserRoute();
+    const userRoutes = container.resolve(UserRoute);
 
     app.use(express.json());
-    app.use("/users", userRoutes.createUserRoute(datasource));
+    app.use("/users", userRoutes.createUserRoute());
     app.use(errorHandler);
 
     app.listen(port, () => {

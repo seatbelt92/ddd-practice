@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { constants } from "http2";
-import { UserTORepository } from "../../src/user/user.to.repository";
-import { UserService } from "../../src/user/user.service";
 import { UserApplicationService } from "../../src/user/application/user.application.service";
 import {
     UserDeleteCommand,
@@ -10,15 +8,14 @@ import {
     UserUpdateCommand,
 } from "../../src/user/user.command";
 import { UserPersistenceService } from "../../src/user/application/user.persistence.service";
-import { DataSource } from "typeorm";
+import { container, singleton } from "tsyringe";
 
+@singleton()
 export class UserRoute {
-    createUserRoute(datasource: DataSource): Router {
+    createUserRoute(): Router {
         const userRoutes = Router();
-        const userRepository = new UserTORepository(datasource);
-        const userService = new UserService(userRepository);
-        const userAppService = new UserApplicationService(userService, userRepository);
-        const userPerService = new UserPersistenceService(userRepository);
+        const userAppService = container.resolve(UserApplicationService);
+        const userPerService = container.resolve(UserPersistenceService);
 
         userRoutes.post("/", async (req, res, next) => {
             try {

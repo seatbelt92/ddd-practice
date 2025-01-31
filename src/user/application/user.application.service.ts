@@ -1,3 +1,4 @@
+import { inject, singleton } from "tsyringe";
 import { AlreadyExistError, ResourceNotFoundError } from "../../common/base.error";
 import { User } from "../user";
 import { UserRegisterCommand, UserUpdateCommand } from "../user.command";
@@ -5,11 +6,13 @@ import { UserDataModel } from "../user.dto";
 import { UserRepository } from "../user.repository";
 import { UserService } from "../user.service";
 import { UserId, UserName } from "../user.vo";
+import { UserTORepository } from "../user.to.repository";
 
+@singleton()
 export class UserApplicationService {
     constructor(
-        private userService: UserService,
-        private userRepository: UserRepository,
+        @inject(UserService) private userService: UserService,
+        @inject(UserTORepository) private userRepository: UserRepository,
     ) {}
 
     async registerUser(command: UserRegisterCommand): Promise<UserDataModel> {

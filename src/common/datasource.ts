@@ -1,7 +1,9 @@
 import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { User } from "../user/user";
+import { singleton } from "tsyringe";
 
+@singleton()
 export class AppDataSource extends DataSource {
     constructor() {
         super({
