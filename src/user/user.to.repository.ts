@@ -2,11 +2,14 @@ import { DataSource, Repository } from "typeorm";
 import { User } from "./user";
 import { UserRepository } from "./user.repository";
 import { UserId, UserName } from "./user.vo";
+import { inject, singleton } from "tsyringe";
+import { AppDataSource } from "../common/datasource";
 
+@singleton()
 export class UserTORepository implements UserRepository {
     private repository: Repository<User>;
 
-    constructor(private datasource: DataSource) {
+    constructor(@inject(AppDataSource) private datasource: DataSource) {
         this.repository = this.datasource.getRepository(User);
     }
 

@@ -1,11 +1,14 @@
+import { inject, singleton } from "tsyringe";
 import { ResourceNotFoundError } from "../../common/base.error";
 import { UserDeleteCommand, UserGetCommand } from "../user.command";
 import { UserDataModel } from "../user.dto";
 import { UserRepository } from "../user.repository";
 import { UserId } from "../user.vo";
+import { UserTORepository } from "../user.to.repository";
 
+@singleton()
 export class UserPersistenceService {
-    constructor(private userRepository: UserRepository) {}
+    constructor(@inject(UserTORepository) private userRepository: UserRepository) {}
 
     async getUser(command: UserGetCommand): Promise<UserDataModel> {
         const { id } = command;
