@@ -25,31 +25,35 @@ export class CircleApplicationService {
         const { userId, name } = command;
         const ownerId = new UserId(userId);
 
-        const owner = await this.userRepository.findById(ownerId);
-        if (!owner) throw new ResourceNotFoundError();
-
         const circleName = new CircleName(name);
         const circle = this.circleFactory.create(circleName, new Owner(ownerId));
 
-        if (await this.circleService.exists(circle)) throw new AlreadyExistError();
+        return this.circleRepository.manager.transaction(async (manager) => {
+            const owner = await this.userRepository.findByIdWithLock(manager, ownerId);
+            if (!owner) throw new ResourceNotFoundError();
 
-        return this.circleRepository.save(circle);
+            if (await this.circleService.exists(manager, circle)) throw new AlreadyExistError();
+
+            return manager.save(circle);
+        });
     }
 
     async joinCircle(command: CircleJoinCommand): Promise<Circle> {
         const { userId, id } = command;
         const memberId = new UserId(userId);
 
-        const member = await this.userRepository.findById(memberId);
-        if (!member) throw new ResourceNotFoundError();
+        return this.circleRepository.manager.transaction(async (manager) => {
+            const member = await this.userRepository.findByIdWithLock(manager, memberId);
+            if (!member) throw new ResourceNotFoundError();
 
-        const circle = await this.circleRepository.findById(id);
-        if (!circle) throw new ResourceNotFoundError();
+            const circle = await this.circleRepository.findByIdWithLock(manager, id);
+            if (!circle) throw new ResourceNotFoundError();
 
-        if (circle.members.length >= 29)
-            throw Error("서클 가입자는 서클장을 포함해서 30명 이하여야 합니다.");
-        circle.add(member);
+            if (circle.members.length >= 29)
+                throw Error("서클 가입자는 서클장을 포함해서 30명 이하여야 합니다.");
+            circle.add(member);
 
-        return this.circleRepository.save(circle);
+            return manager.save(circle);
+        });
     }
 }
