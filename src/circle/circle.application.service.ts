@@ -49,10 +49,7 @@ export class CircleApplicationService {
             const circle = await this.circleRepository.findByIdWithLock(manager, id);
             if (!circle) throw new ResourceNotFoundError();
 
-            if (circle.members.length >= 29)
-                throw Error("서클 가입자는 서클장을 포함해서 30명 이하여야 합니다.");
-            circle.add(member);
-
+            circle.join(member);
             return manager.save(circle);
         });
     }
