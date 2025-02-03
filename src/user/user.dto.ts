@@ -1,5 +1,5 @@
 import { User } from "./user";
-import { UserId, UserName } from "./user.vo";
+import { UserName } from "./user.vo";
 
 export class UserDataModel {
     constructor(user: User) {
@@ -8,7 +8,7 @@ export class UserDataModel {
         this.createdAt = user.createdAt;
     }
 
-    userId: UserId;
+    userId: string;
     userName: UserName;
     createdAt: Date;
 }

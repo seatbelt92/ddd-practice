@@ -1,7 +1,7 @@
 import { DataSource, EntityManager, Repository } from "typeorm";
 import { User } from "./user";
 import { UserRepository } from "./user.repository";
-import { UserId, UserName } from "./user.vo";
+import { UserName } from "./user.vo";
 import { inject, singleton } from "tsyringe";
 import { AppDataSource } from "../common/datasource";
 
@@ -25,11 +25,11 @@ export class UserTORepository implements UserRepository {
         return this.repository.find({ where: { userName } });
     }
 
-    async findById(userId: UserId): Promise<User | null> {
+    async findById(userId: string): Promise<User | null> {
         return this.repository.findOne({ where: { userId } });
     }
 
-    async findByIdWithLock(manager: EntityManager, userId: UserId): Promise<User | null> {
+    async findByIdWithLock(manager: EntityManager, userId: string): Promise<User | null> {
         return manager.findOne(User, {
             where: { userId },
             transaction: true,

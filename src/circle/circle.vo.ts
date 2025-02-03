@@ -1,5 +1,4 @@
 import { Column } from "typeorm";
-import { UserId } from "../user/user.vo";
 
 export class CircleName {
     constructor(public value: string) {
@@ -18,15 +17,9 @@ export class CircleName {
 }
 
 export class Owner {
-    constructor(id: UserId) {
+    constructor(id: string) {
         this.id = id;
     }
-    @Column({
-        type: "varchar",
-        transformer: {
-            to: (value: UserId) => value.value,
-            from: (value: string) => new UserId(value),
-        },
-    })
-    id: UserId;
+    @Column({ type: "varchar" })
+    id: string;
 }

@@ -3,7 +3,6 @@ import { ResourceNotFoundError } from "../../common/base.error";
 import { UserDeleteCommand, UserGetCommand } from "../user.command";
 import { UserDataModel } from "../user.dto";
 import { UserRepository } from "../user.repository";
-import { UserId } from "../user.vo";
 import { UserTORepository } from "../user.to.repository";
 
 @singleton()
@@ -12,7 +11,7 @@ export class UserPersistenceService {
 
     async getUser(command: UserGetCommand): Promise<UserDataModel> {
         const { id } = command;
-        const user = await this.userRepository.findById(new UserId(id));
+        const user = await this.userRepository.findById(id);
         if (!user) throw new ResourceNotFoundError();
 
         return new UserDataModel(user);
@@ -26,7 +25,7 @@ export class UserPersistenceService {
 
     async deleteUser(command: UserDeleteCommand): Promise<UserDataModel> {
         const { id } = command;
-        const user = await this.userRepository.findById(new UserId(id));
+        const user = await this.userRepository.findById(id);
         if (!user) throw new ResourceNotFoundError();
 
         return new UserDataModel(await this.userRepository.delete(user));

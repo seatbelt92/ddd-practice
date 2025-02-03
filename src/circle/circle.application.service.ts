@@ -3,7 +3,6 @@ import { CircleTORepository } from "./circle.to.repository";
 import { CircleRepository } from "./circle.repository";
 import { CircleService } from "./circle.service";
 import { CircleCreateCommand, CircleJoinCommand } from "./circle.command";
-import { UserId } from "../user/user.vo";
 import { UserTORepository } from "../user/user.to.repository";
 import { AlreadyExistError, ResourceNotFoundError } from "../common/base.error";
 import { CircleName, Owner } from "./circle.vo";
@@ -23,7 +22,7 @@ export class CircleApplicationService {
 
     async createCircle(command: CircleCreateCommand): Promise<Circle> {
         const { userId, name } = command;
-        const ownerId = new UserId(userId);
+        const ownerId = userId;
 
         const circleName = new CircleName(name);
         const circle = this.circleFactory.create(circleName, new Owner(ownerId));
@@ -40,7 +39,7 @@ export class CircleApplicationService {
 
     async joinCircle(command: CircleJoinCommand): Promise<Circle> {
         const { userId, id } = command;
-        const memberId = new UserId(userId);
+        const memberId = userId;
 
         return this.circleRepository.manager.transaction(async (manager) => {
             const member = await this.userRepository.findByIdWithLock(manager, memberId);
