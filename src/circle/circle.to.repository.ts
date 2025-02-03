@@ -32,6 +32,7 @@ export class CircleTORepository {
             where: { id },
             transaction: true,
             lock: { mode: "pessimistic_write" },
+            relations: { members: true },
         });
     }
 

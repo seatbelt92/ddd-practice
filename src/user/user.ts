@@ -1,9 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserName } from "./user.vo";
 import { v4 as uuidv4 } from "uuid";
 import { BaseEntity } from "../common/base.entity";
 import { Type } from "class-transformer";
 import { IsNotEmpty, ValidateNested } from "class-validator";
+import { Circle } from "../circle/circle";
 
 @Entity("tb_user")
 export class User extends BaseEntity {
@@ -24,6 +25,9 @@ export class User extends BaseEntity {
     @Type(() => UserName)
     @ValidateNested()
     userName: UserName;
+
+    @ManyToMany(() => Circle, (circle) => circle.members)
+    readonly circles: Circle[];
 
     changeUserName(userName: UserName): void {
         if (!userName) {

@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "../common/base.entity";
 import { CircleName, Owner } from "./circle.vo";
 import { CircleCapacityExceededError } from "./circle.error";
+import { User } from "../user/user";
 
 @Entity("tb_circle")
 export class Circle extends BaseEntity {
@@ -26,15 +27,20 @@ export class Circle extends BaseEntity {
     @Column(() => Owner)
     owner: Owner;
 
-    @Column({ type: "json" })
-    members: string[];
+    @ManyToMany(() => User, (user) => user.circles)
+    @JoinTable({
+        name: "tb_circle_member",
+        joinColumn: { name: "circle_id", referencedColumnName: "id" },
+        inverseJoinColumn: { name: "user_id", referencedColumnName: "userId" },
+    })
+    members: User[];
 
     isFull(): boolean {
         return this.members.length >= 29;
     }
 
-    join(userId: string): void {
+    join(user: User): void {
         if (this.isFull()) throw new CircleCapacityExceededError();
-        this.members.push(userId);
+        this.members.push(user);
     }
 }
