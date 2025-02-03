@@ -1,7 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "../common/base.entity";
 import { CircleName, Owner } from "./circle.vo";
-import { CircleCapacityExceededError } from "./circle.error";
 import { User } from "../user/user";
 
 @Entity("tb_circle")
@@ -35,16 +34,11 @@ export class Circle extends BaseEntity {
     })
     members: User[];
 
-    isFull(): boolean {
-        return this.countMember() >= 30;
-    }
-
     countMember(): number {
         return this.members.length + 1;
     }
 
     join(user: User): void {
-        if (this.isFull()) throw new CircleCapacityExceededError();
         this.members.push(user);
     }
 }

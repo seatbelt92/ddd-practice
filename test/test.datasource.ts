@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { User } from "../src/user/user";
+import { Circle } from "../src/circle/circle";
 
 export class TestDataSource extends DataSource {
     constructor() {
@@ -11,7 +12,7 @@ export class TestDataSource extends DataSource {
             logging: false,
             dropSchema: true,
             namingStrategy: new SnakeNamingStrategy(),
-            entities: [User],
+            entities: [User, Circle],
         });
     }
 }

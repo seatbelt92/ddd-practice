@@ -26,6 +26,9 @@ export class User extends BaseEntity {
     @ValidateNested()
     userName: UserName;
 
+    @Column({ type: "boolean" })
+    isPremium = false;
+
     @ManyToMany(() => Circle, (circle) => circle.members)
     readonly circles: Circle[];
 

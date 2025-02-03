@@ -57,7 +57,7 @@ describe("UserApplicationService", () => {
 
         const updatedName = "newName";
         const updatedUser = await userAppService.updateUser(
-            new UserUpdateCommand(user.userId, updatedName),
+            new UserUpdateCommand(user.userId, updatedName, user.isPremium),
         );
 
         expect(updatedUser.userName.value).toBe(updatedName);
@@ -66,7 +66,7 @@ describe("UserApplicationService", () => {
     test("throw an error when updating a non-existent user", async () => {
         const nonExistentId = "non-existent-id";
         await expect(
-            userAppService.updateUser(new UserUpdateCommand(nonExistentId, "newName")),
+            userAppService.updateUser(new UserUpdateCommand(nonExistentId, "newName", false)),
         ).rejects.toThrow(ResourceNotFoundError);
     });
 
@@ -75,7 +75,7 @@ describe("UserApplicationService", () => {
         const user2 = await userAppService.registerUser(new UserRegisterCommand("user2"));
 
         await expect(
-            userAppService.updateUser(new UserUpdateCommand(user2.userId, "user1")),
+            userAppService.updateUser(new UserUpdateCommand(user2.userId, "user1", false)),
         ).rejects.toThrow(AlreadyExistError);
     });
 

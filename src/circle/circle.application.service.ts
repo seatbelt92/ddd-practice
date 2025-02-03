@@ -10,6 +10,8 @@ import { Circle } from "./circle";
 import { CircleFactory } from "./circle.factory";
 import { UserRepository } from "../user/user.repository";
 import { DefaultCircleFactory } from "./default.circle.factory";
+import { CircleFullSpecification } from "./circle.specification";
+import { CircleCapacityExceededError } from "./circle.error";
 
 @singleton()
 export class CircleApplicationService {
@@ -41,17 +43,18 @@ export class CircleApplicationService {
         const { userId, id } = command;
         const memberId = userId;
 
+        const circleFullSpec = new CircleFullSpecification();
+
         return this.circleRepository.manager.transaction(async (manager) => {
             const member = await this.userRepository.findByIdWithLock(manager, memberId);
             if (!member) throw new ResourceNotFoundError();
 
             const circle = await this.circleRepository.findByIdWithLock(manager, id);
             if (!circle) throw new ResourceNotFoundError();
+            if (circleFullSpec.isSatisfiedBy(circle)) throw new CircleCapacityExceededError();
 
             circle.join(member);
             return manager.save(circle);
-
-            // return circle;
         });
     }
 }

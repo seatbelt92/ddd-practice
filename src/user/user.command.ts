@@ -2,11 +2,15 @@ export class UserUpdateCommand {
     constructor(
         public id: string,
         public name: string,
+        public isPremeum: boolean,
     ) {}
 }
 
 export class UserRegisterCommand {
-    constructor(public name: string) {}
+    constructor(
+        public name: string,
+        public isPremeum?: boolean,
+    ) {}
 }
 
 export class UserGetCommand {
