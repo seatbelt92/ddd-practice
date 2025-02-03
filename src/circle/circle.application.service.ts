@@ -49,7 +49,7 @@ export class CircleApplicationService {
             const circle = await this.circleRepository.findByIdWithLock(manager, id);
             if (!circle) throw new ResourceNotFoundError();
 
-            circle.join(member);
+            circle.join(memberId);
             return manager.save(circle);
         });
     }

@@ -24,7 +24,7 @@ export class CircleRoute {
         circleRoutes.put("/:id", async (req, res, next) => {
             try {
                 const { id } = req.params;
-                const { userId } = req.query;
+                const { userId } = req.body;
                 const command = new CircleJoinCommand(Number(id), String(userId));
                 const circle = await circleAppService.joinCircle(command);
                 res.status(constants.HTTP_STATUS_OK).json(circle);

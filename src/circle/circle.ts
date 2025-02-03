@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "../common/base.entity";
 import { CircleName, Owner } from "./circle.vo";
-import { User } from "../user/user";
 import { CircleCapacityExceededError } from "./circle.error";
+import { UserId } from "../user/user.vo";
 
 @Entity("tb_circle")
 export class Circle extends BaseEntity {
@@ -28,14 +28,14 @@ export class Circle extends BaseEntity {
     owner: Owner;
 
     @Column({ type: "json" })
-    members: User[];
+    members: UserId[];
 
     isFull(): boolean {
         return this.members.length >= 29;
     }
 
-    join(user: User): void {
+    join(userId: UserId): void {
         if (this.isFull()) throw new CircleCapacityExceededError();
-        this.members.push(user);
+        this.members.push(userId);
     }
 }
