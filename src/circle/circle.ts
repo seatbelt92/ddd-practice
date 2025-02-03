@@ -36,7 +36,11 @@ export class Circle extends BaseEntity {
     members: User[];
 
     isFull(): boolean {
-        return this.members.length >= 29;
+        return this.countMember() >= 30;
+    }
+
+    countMember(): number {
+        return this.members.length + 1;
     }
 
     join(user: User): void {
