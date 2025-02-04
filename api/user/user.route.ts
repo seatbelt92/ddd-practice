@@ -52,7 +52,7 @@ export class UserRoute {
             try {
                 const { id } = req.params;
                 const { name } = req.body;
-                const command = new UserUpdateCommand(id, name);
+                const command = new UserUpdateCommand(id, name, false);
                 const user = await userAppService.updateUser(command);
                 res.status(constants.HTTP_STATUS_OK).json(user);
             } catch (err) {
