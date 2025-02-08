@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { User } from "../user/user";
 import { singleton } from "tsyringe";
+import { Circle } from "../circle/circle";
 
 @singleton()
 export class AppDataSource extends DataSource {
@@ -16,7 +17,7 @@ export class AppDataSource extends DataSource {
             synchronize: false,
             logging: false,
             namingStrategy: new SnakeNamingStrategy(),
-            entities: [User],
+            entities: [User, Circle],
         });
     }
 }

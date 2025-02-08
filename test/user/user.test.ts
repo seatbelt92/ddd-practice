@@ -1,5 +1,6 @@
 import { User } from "../../src/user/user";
 import { UserName } from "../../src/user/user.vo";
+import { validateOrReject, ValidationError } from "class-validator";
 
 describe("Test - User entity", () => {
     test("create a User", () => {
@@ -32,15 +33,22 @@ describe("Test - User entity", () => {
         );
     });
 
-    test("throw an error when the length of username is not between 2 and 10", () => {
+    test("throw an error when the length of username is not between 2 and 10", async () => {
         const underTwoName = "1";
         const overTenName = "lengthIsOver10";
 
-        expect(() => new UserName(underTwoName)).toThrow(
-            "사용자명은 2글자 이상, 10글자 이하여야 합니다.",
-        );
-        expect(() => new UserName(overTenName)).toThrow(
-            "사용자명은 2글자 이상, 10글자 이하여야 합니다.",
-        );
+        try {
+            await validateOrReject(new UserName(underTwoName));
+        } catch (errors: unknown) {
+            const validationErrors = errors as ValidationError[];
+            expect(validationErrors[0].constraints?.min).toBe("value must not be less than 2");
+        }
+
+        try {
+            await validateOrReject(new UserName(overTenName));
+        } catch (errors: unknown) {
+            const validationErrors = errors as ValidationError[];
+            expect(validationErrors[0].constraints?.max).toBe("value must not be greater than 10");
+        }
     });
 });

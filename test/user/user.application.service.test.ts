@@ -57,7 +57,7 @@ describe("UserApplicationService", () => {
 
         const updatedName = "newName";
         const updatedUser = await userAppService.updateUser(
-            new UserUpdateCommand(user.userId.value, updatedName),
+            new UserUpdateCommand(user.userId, updatedName, user.isPremium),
         );
 
         expect(updatedUser.userName.value).toBe(updatedName);
@@ -66,7 +66,7 @@ describe("UserApplicationService", () => {
     test("throw an error when updating a non-existent user", async () => {
         const nonExistentId = "non-existent-id";
         await expect(
-            userAppService.updateUser(new UserUpdateCommand(nonExistentId, "newName")),
+            userAppService.updateUser(new UserUpdateCommand(nonExistentId, "newName", false)),
         ).rejects.toThrow(ResourceNotFoundError);
     });
 
@@ -75,7 +75,7 @@ describe("UserApplicationService", () => {
         const user2 = await userAppService.registerUser(new UserRegisterCommand("user2"));
 
         await expect(
-            userAppService.updateUser(new UserUpdateCommand(user2.userId.value, "user1")),
+            userAppService.updateUser(new UserUpdateCommand(user2.userId, "user1", false)),
         ).rejects.toThrow(AlreadyExistError);
     });
 
@@ -83,9 +83,9 @@ describe("UserApplicationService", () => {
         const userName = "testUser1";
         const user = await userAppService.registerUser(new UserRegisterCommand(userName));
 
-        const savedUser = await userPerService.getUser(new UserGetCommand(user.userId.value));
+        const savedUser = await userPerService.getUser(new UserGetCommand(user.userId));
 
-        expect(savedUser.userId.value).toBe(user.userId.value);
+        expect(savedUser.userId).toBe(user.userId);
         expect(savedUser.userName.value).toBe(userName);
     });
 
@@ -110,11 +110,9 @@ describe("UserApplicationService", () => {
 
     test("delete a user", async () => {
         const user = await userAppService.registerUser(new UserRegisterCommand("testUser"));
-        const deletedUser = await userPerService.deleteUser(
-            new UserDeleteCommand(user.userId.value),
-        );
+        const deletedUser = await userPerService.deleteUser(new UserDeleteCommand(user.userId));
 
-        expect(deletedUser.userId.value).toBe(user.userId.value);
+        expect(deletedUser.userId).toBe(user.userId);
         await expect(userRepository.findById(user.userId)).resolves.toBeNull();
     });
 
